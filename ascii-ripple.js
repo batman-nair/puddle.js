@@ -26,8 +26,8 @@ class Node {
 	this.element.onclick = () => this.startRipple();
 	return this.element;
     }
-    startRipple() {
-	this.omniForce = 100.0;
+    startRipple(rippleStrength = 100.0) {
+	this.omniForce = rippleStrength;
 	this.element.innerText = this.asciiShades[this.asciiShades.length-1];
 	for (let yChange = -1; yChange <=1; ++yChange) {
 	    for (let xChange = -1; xChange <=1; ++xChange) {
@@ -47,7 +47,6 @@ class Node {
 	// console.log("updated forces to: ", this.nextFy, this.nextFx);
     }
     updateNode() {
-	this.element.style.background = "green";
 	for (let yChange = -1; yChange <=1; ++yChange) {
 	    for (let xChange = -1; xChange <=1; ++xChange) {
 		if (yChange == 0 && xChange == 0) continue;
@@ -84,7 +83,6 @@ class Node {
 	    }
 	}
 	this.data.addToDrawQueue(this.xx, this.yy);
-	this.element.style.background = "none";
     }
     drawNode() {
 	// console.log("fx: ", this.fx, "fy: ", this.fy, "nfx: ", this.nextFx, "nfy: ", this.nextFy);
@@ -136,10 +134,8 @@ class AsciiRippleData {
 	}
     }
     addToDrawQueue(xx, yy) {
-	let index = yy*this.numCols + xx;
 	// Adding to draw is only done on self and so no errors should pop up
-	// if (index < 0 || index >= this.nodeList.length)
-	// 	  return;
+	let index = yy*this.numCols + xx;
 	this.drawQueue.push(index);
     }
     drawElements() {
@@ -169,11 +165,14 @@ class AsciiRippleData {
 }
 
 class AsciiRipple {
-    constructor(elementID, numCols, numRows, updateInterval=300) {
+    constructor(elementID, numCols, numRows, updateInterval=100) {
 	this.parentNode = document.getElementById(elementID);
 	this.numRows = numRows;
 	this.numCols = numCols;
 	this.data = new AsciiRippleData(numRows, numCols);
+	this.areRandomRipplesGenerated = false;
+	this.randomGenerationInterval = updateInterval;
+	this.randomTimeRange = updateInterval;
 
 	this.setupGrid();
 	setInterval(() => this.tryUpdateElements(), updateInterval);
@@ -181,7 +180,7 @@ class AsciiRipple {
     setupGrid() {
 	this.parentNode.style.display = "grid";
 	this.parentNode.style.gridTemplateColumns = "repeat(" + this.numCols + ", 1.5ch)"; // Make these Node static constants
-	this.parentNode.style.gridTemplateRows = "repeat(" + this.numRows + ", 1em)";
+	this.parentNode.style.gridTemplateRows = "repeat(" + this.numRows + ", 0.8em)";
 	for (let yy = 0; yy < this.numRows; ++yy) {
 	    for (let xx = 0; xx < this.numCols; ++xx) {
 		let node = new Node(xx, yy, this.data);
@@ -190,10 +189,22 @@ class AsciiRipple {
 	    }
 	}
     }
+    toggleRandomRipples() {
+	this.areRandomRipplesGenerated = !this.areRandomRipplesGenerated;
+    }
+    createRandomRipple() {
+	setTimeout(() =>
+		   this.data.nodeList[Math.floor(Math.random()*this.data.nodeList.length)].startRipple(),
+		   this.randomGenerationInterval +
+		   Math.floor(Math.random()*this.randomTimeRange)-this.randomTimeRange/2);
+
+    }
     tryUpdateElements() {
 	if (this.data.isUpdateDone)
 	    this.data.updateElements()
 	else
 	    console.log("Previous update not completed, skipping update");
+	if (this.areRandomRipplesGenerated)
+	    this.createRandomRipple();
     }
 }
