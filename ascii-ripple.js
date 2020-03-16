@@ -26,6 +26,8 @@ class Node {
 	this.element.innerText = ".";
 	this.element.onclick = () => this.startRipple();
 	this.element.onmousemove = () => {
+	    if (!this.data.rippleOnMove)
+		return;
 	    if (this.isMoveForceDelayComplete) {
 		this.isMoveForceDelayComplete = false;
 		this.startRipple();
@@ -119,6 +121,7 @@ class AsciiRippleData {
 
 	this.forceDampeningRatio = 0.8; // Force dampening percent
 	this.forceCutOff = 5;	// Axial force less than this is set to 0
+	this.rippleOnMove = false;
     }
     appendNode(node) {
 	this.nodeList.push(node);
@@ -236,6 +239,9 @@ class AsciiRipple {
 	for (let yy = 0; yy < this.numCols; ++yy) {
 	    this.data.getNode(0, yy).startRipple(400);
 	}
+    }
+    toggleRippleOnMove() {
+	this.data.rippleOnMove = !this.data.rippleOnMove;
     }
     tryUpdateElements() {
 	if (this.data.isUpdateDone)
