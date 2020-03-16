@@ -32,13 +32,6 @@ class Node {
 		setTimeout(() => this.isMoveForceDelayComplete = true, 500);
 	    }
 	};
-	this.element.ontouchmove = () => {
-	    if (this.isMoveForceDelayComplete) {
-		this.isMoveForceDelayComplete = false;
-		this.startRipple();
-		setTimeout(() => this.isMoveForceDelayComplete = true, 500);
-	    }
-	};
 	return this.element;
     }
     startRipple(rippleStrength = 100.0) {
