@@ -173,6 +173,8 @@ class AsciiRipple {
 	this.areRandomRipplesGenerated = false;
 	this.randomGenerationInterval = updateInterval;
 	this.randomTimeRange = updateInterval;
+	this.useRandomRippleStrength = false;
+	this.maxRandomRippleStrength = 200;
 
 	this.setupGrid();
 	setInterval(() => this.tryUpdateElements(), updateInterval);
@@ -192,11 +194,25 @@ class AsciiRipple {
     toggleRandomRipples() {
 	this.areRandomRipplesGenerated = !this.areRandomRipplesGenerated;
     }
+    toggleRandomRippleStrength() {
+	this.useRandomRippleStrength = !this.useRandomRippleStrength;
+    }
+    setRandomRippleGenerationInterval(randomRippleGenerationInterval) {
+	this.randomGenerationInterval = randomRippleGenerationInterval;
+    }
+    setDampeningStrength(dampeningStrength) {
+	this.data.forceDampening = dampeningStrength;
+    }
     createRandomRipple() {
-	setTimeout(() =>
-		   this.data.nodeList[Math.floor(Math.random()*this.data.nodeList.length)].startRipple(),
-		   this.randomGenerationInterval +
-		   Math.floor(Math.random()*this.randomTimeRange)-this.randomTimeRange/2);
+	setTimeout(() => {
+	    let rippleStrength = Math.floor(Math.random()*this.maxRandomRippleStrength);
+	    let randomIndex = Math.floor(Math.random()*this.data.nodeList.length);
+	    let timeoutChange = Math.floor(Math.random()*this.randomTimeRange)
+		- this.randomTimeRange/2;
+
+	    this.data.nodeList[randomIndex].startRipple(rippleStrength),
+	    this.randomGenerationInterval + timeoutChange
+	});
 
     }
     tryUpdateElements() {
