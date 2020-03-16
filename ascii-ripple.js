@@ -10,6 +10,7 @@ class Node {
 	this.nextFx = 0;
 	this.nextFy = 0;
 	this.isAddedToUpdate = false;
+	this.isMoveForceDelayComplete = true;
 	this.asciiShades = [...".,:;+cCOG@M"];
 	this.asciiThreshold = [];
 	for (let index = 0; index < this.asciiShades.length; ++index) {
@@ -24,6 +25,20 @@ class Node {
 	this.element.style.height = "100%";
 	this.element.innerText = ".";
 	this.element.onclick = () => this.startRipple();
+	this.element.onmousemove = () => {
+	    if (this.isMoveForceDelayComplete) {
+		this.isMoveForceDelayComplete = false;
+		this.startRipple();
+		setTimeout(() => this.isMoveForceDelayComplete = true, 500);
+	    }
+	};
+	this.element.ontouchmove = () => {
+	    if (this.isMoveForceDelayComplete) {
+		this.isMoveForceDelayComplete = false;
+		this.startRipple();
+		setTimeout(() => this.isMoveForceDelayComplete = true, 500);
+	    }
+	};
 	return this.element;
     }
     startRipple(rippleStrength = 100.0) {
@@ -87,8 +102,8 @@ class Node {
     drawNode() {
 	// console.log("fx: ", this.fx, "fy: ", this.fy, "nfx: ", this.nextFx, "nfy: ", this.nextFy);
 	this.omniForce = 0;
-	this.fx = Math.floor(this.nextFx * this.data.forceDampening);
-	this.fy = Math.floor(this.nextFy * this.data.forceDampening);
+	this.fx = Math.floor(this.nextFx * this.data.forceDampeningRatio);
+	this.fy = Math.floor(this.nextFy * this.data.forceDampeningRatio);
 	if (Math.abs(this.fx) < this.data.forceCutOff) this.fx = 0;
 	if (Math.abs(this.fy) < this.data.forceCutOff) this.fy = 0;
 	this.nextFx = 0;
@@ -109,7 +124,7 @@ class AsciiRippleData {
 	this.numRows = numRows;
 	this.numCols = numCols;
 
-	this.forceDampening = 0.8; // Force dampening percent
+	this.forceDampeningRatio = 0.8; // Force dampening percent
 	this.forceCutOff = 5;	// Axial force less than this is set to 0
     }
     appendNode(node) {
@@ -173,16 +188,19 @@ class AsciiRipple {
 	this.areRandomRipplesGenerated = false;
 	this.randomGenerationInterval = updateInterval;
 	this.randomTimeRange = updateInterval;
-	this.useRandomRippleStrength = false;
+	this.useRandomRippleStrength = true;
 	this.maxRandomRippleStrength = 200;
+	this.isRandomRippleCreated = true;
 
 	this.setupGrid();
 	setInterval(() => this.tryUpdateElements(), updateInterval);
     }
     setupGrid() {
+	this.parentNode.style.fontFamily = "Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace";
+	this.parentNode.style.fontSize = "14px";
 	this.parentNode.style.display = "grid";
-	this.parentNode.style.gridTemplateColumns = "repeat(" + this.numCols + ", 1.5ch)"; // Make these Node static constants
-	this.parentNode.style.gridTemplateRows = "repeat(" + this.numRows + ", 0.8em)";
+	this.parentNode.style.gridTemplateColumns = "repeat(" + this.numCols + ", 12px)"; // Make these Node static constants
+	this.parentNode.style.gridTemplateRows = "repeat(" + this.numRows + ", 12px)";
 	for (let yy = 0; yy < this.numRows; ++yy) {
 	    for (let xx = 0; xx < this.numCols; ++xx) {
 		let node = new Node(xx, yy, this.data);
@@ -200,27 +218,38 @@ class AsciiRipple {
     setRandomRippleGenerationInterval(randomRippleGenerationInterval) {
 	this.randomGenerationInterval = randomRippleGenerationInterval;
     }
-    setDampeningStrength(dampeningStrength) {
-	this.data.forceDampening = dampeningStrength;
+    setRandomRippleTimeRange(randomRippleTimeRange) {
+	this.randomTimeRange = randomRippleTimeRange;
+    }
+    setDampeningRatio(dampeningRatio) {
+	this.data.forceDampeningRatio = dampeningRatio;
     }
     createRandomRipple() {
+	let rippleStrength = Math.floor(Math.random()*this.maxRandomRippleStrength);
+	let randomIndex = Math.floor(Math.random()*this.data.nodeList.length);
+	this.data.nodeList[randomIndex].startRipple(rippleStrength);
+    }
+    createTimedRandomRipple() {
+	this.isRandomRippleCreated = false;
+	let timeoutChange = Math.floor(Math.random()*this.randomTimeRange)
+	    - this.randomTimeRange/2;
+	let timeout = this.randomGenerationInterval + timeoutChange;
 	setTimeout(() => {
-	    let rippleStrength = Math.floor(Math.random()*this.maxRandomRippleStrength);
-	    let randomIndex = Math.floor(Math.random()*this.data.nodeList.length);
-	    let timeoutChange = Math.floor(Math.random()*this.randomTimeRange)
-		- this.randomTimeRange/2;
-
-	    this.data.nodeList[randomIndex].startRipple(rippleStrength),
-	    this.randomGenerationInterval + timeoutChange
-	});
-
+	    this.createRandomRipple();
+	    this.isRandomRippleCreated = true;
+	}, timeout);
+    }
+    createWave() {
+	for (let yy = 0; yy < this.numCols; ++yy) {
+	    this.data.getNode(0, yy).startRipple(400);
+	}
     }
     tryUpdateElements() {
 	if (this.data.isUpdateDone)
 	    this.data.updateElements()
 	else
 	    console.log("Previous update not completed, skipping update");
-	if (this.areRandomRipplesGenerated)
-	    this.createRandomRipple();
+	if (this.areRandomRipplesGenerated && this.isRandomRippleCreated)
+	    this.createTimedRandomRipple();
     }
 }

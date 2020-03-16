@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
   <body>
-
     <div id="ripple-container">
     </div>
 
@@ -10,8 +9,16 @@
     <script src="ascii-ripple.js"></script>
     <script>
       var ar = new AsciiRipple("ripple-container", 100, 100);
-      ar.toggleRandomRipples();
-      ar.toggleRandomRippleStrength();
+      ar.toggleRandomRipples();	// Default False
+      // ar.toggleRandomRippleStrength(); // Default True
+      // ar.setRandomRippleGenerationInterval(100); // Default updateInterval
+      // ar.setRandomRippleTimeRange(100);		  // Default updateInterval
+      // // Random ripples are generated at RippleGenerationInterval (+/-) RippleTimeRange/2
+
+      // ar.createRandomRipple();
+      // ar.createWave();
+
+      // ar.setDampeningRatio(0.5); // Default 0.8
     </script>
 
   </body>
