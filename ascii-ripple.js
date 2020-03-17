@@ -1,4 +1,4 @@
-class Node {
+class NodeBase {
     constructor(xx, yy, data) {
 	this.xx = xx;
 	this.yy = yy;
@@ -11,19 +11,8 @@ class Node {
 	this.nextFy = 0;
 	this.isAddedToUpdate = false;
 	this.isMoveForceDelayComplete = true;
-	this.asciiShades = [...".,:;+cCOG@M"];
-	this.asciiThreshold = [];
-	for (let index = 0; index < this.asciiShades.length; ++index) {
-	    this.asciiThreshold.push(index * 100.0/(this.asciiShades.length-1));
-	}
     }
-    getNodeElement() {
-	this.element = document.createElement("p");
-	this.element.className = "cell";
-	this.element.style.display = "block";
-	this.element.style.width = "100%";
-	this.element.style.height = "100%";
-	this.element.innerText = ".";
+    applyListeners() {
 	this.element.onclick = () => this.startRipple();
 	this.element.onmousemove = () => {
 	    if (!this.data.rippleOnMove)
@@ -34,11 +23,19 @@ class Node {
 		setTimeout(() => this.isMoveForceDelayComplete = true, 500);
 	    }
 	};
+    }
+    getNodeElement() {
+	this.element = document.createElement("div");
+	this.element.className = "cell";
+	this.element.style.display = "block";
+	this.element.style.width = "100%";
+	this.element.style.height = "100%";
+	this.applyListeners();
 	return this.element;
     }
     startRipple(rippleStrength = 100.0) {
 	this.omniForce = rippleStrength;
-	this.element.innerText = this.asciiShades[this.asciiShades.length-1];
+	this.drawNode(rippleStrength);
 	for (let yChange = -1; yChange <=1; ++yChange) {
 	    for (let xChange = -1; xChange <=1; ++xChange) {
 		this.data.addToUpdateQueue(this.xx+xChange, this.yy+yChange);
@@ -94,7 +91,13 @@ class Node {
 	}
 	this.data.addToDrawQueue(this.xx, this.yy);
     }
-    drawNode() {
+    drawNode(forceMagnitude) {	// forceMagnitude is between 0 and 100 inclusive
+	let hueValue = Math.floor(Math.random()*360);
+	let saturationValue = 50 + forceMagnitude/2;
+	let lightnessValue = 50 + (100 - forceMagnitude)/2;
+	this.element.style.background = "hsl("+ hueValue +", "+ saturationValue +"%, "+ lightnessValue +"%)";
+    }
+    computeForceAndDrawNode() {
 	// console.log("fx: ", this.fx, "fy: ", this.fy, "nfx: ", this.nextFx, "nfy: ", this.nextFy);
 	this.omniForce = 0;
 	this.fx = Math.floor(this.nextFx * this.data.forceDampeningRatio);
@@ -105,10 +108,34 @@ class Node {
 	this.nextFy = 0;
 	let magnitude = Math.sqrt(Math.pow(this.fx, 2) + Math.pow(this.fy, 2));
 	if (magnitude > 100) magnitude = 100;
-	let index = this.asciiThreshold.findIndex((el) => el >= magnitude);
+	this.drawNode(magnitude);
+    }
+}
+
+class AsciiNode extends NodeBase {
+    constructor(xx, yy, data) {
+	super(xx, yy, data);
+	this.asciiShades = [...".,:;+cCOG@M"];
+	this.asciiThreshold = [];
+	for (let index = 0; index < this.asciiShades.length; ++index) {
+	    this.asciiThreshold.push(index * 100.0/(this.asciiShades.length-1));
+	}
+    }
+    getNodeElement() {
+	this.element = document.createElement("p");
+	this.element.style.display = "block";
+	this.element.style.width = "100%";
+	this.element.style.height = "100%";
+	this.element.innerText = ".";
+	this.applyListeners();
+	return this.element;
+    }
+    drawNode(forceMagnitude) {
+	let index = this.asciiThreshold.findIndex((el) => el >= forceMagnitude);
 	this.element.innerText = this.asciiShades[index];
     }
 }
+
 
 class AsciiRippleData {
     constructor(numRows, numCols) {
@@ -154,7 +181,7 @@ class AsciiRippleData {
 	this.drawQueue = [];
 	for (const index of drawList) {
 	    let node = this.nodeList[index];
-	    node.drawNode();
+	    node.computeForceAndDrawNode();
 	}
     }
     updateElements() {
@@ -199,7 +226,7 @@ class AsciiRipple {
 	this.parentNode.style.gridTemplateRows = "repeat(" + this.numRows + ", 12px)";
 	for (let yy = 0; yy < this.numRows; ++yy) {
 	    for (let xx = 0; xx < this.numCols; ++xx) {
-		let node = new Node(xx, yy, this.data);
+		let node = new AsciiNode(xx, yy, this.data);
 		this.data.appendNode(node);
 		this.parentNode.appendChild(node.getNodeElement());
 	    }
