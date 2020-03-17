@@ -30,6 +30,7 @@ class NodeBase {
 	this.element.style.display = "block";
 	this.element.style.width = "100%";
 	this.element.style.height = "100%";
+	this.drawNode(0);
 	this.applyListeners();
 	return this.element;
     }
@@ -92,9 +93,9 @@ class NodeBase {
 	this.data.addToDrawQueue(this.xx, this.yy);
     }
     drawNode(forceMagnitude) {	// forceMagnitude is between 0 and 100 inclusive
-	let hueValue = Math.floor(Math.random()*360);
-	let saturationValue = 50 + forceMagnitude/2;
-	let lightnessValue = 50 + (100 - forceMagnitude)/2;
+	let hueValue = 0;
+	let saturationValue = 0;
+	let lightnessValue = 25 + forceMagnitude/2;
 	this.element.style.background = "hsl("+ hueValue +", "+ saturationValue +"%, "+ lightnessValue +"%)";
     }
     computeForceAndDrawNode() {
@@ -109,6 +110,30 @@ class NodeBase {
 	let magnitude = Math.sqrt(Math.pow(this.fx, 2) + Math.pow(this.fy, 2));
 	if (magnitude > 100) magnitude = 100;
 	this.drawNode(magnitude);
+    }
+}
+
+class WaterNode extends NodeBase {
+    constructor(xx, yy, data) {
+	super(xx, yy, data);
+    }
+    drawNode(forceMagnitude) {	// forceMagnitude is between 0 and 100 inclusive
+	let hueValue = 198;
+	let saturationValue = 70 + forceMagnitude/4;
+	let lightnessValue = 70 + (forceMagnitude)/8;
+	this.element.style.background = "hsl("+ hueValue +", "+ saturationValue +"%, "+ lightnessValue +"%)";
+    }
+}
+
+class PartyNode extends NodeBase {
+    constructor(xx, yy, data) {
+	super(xx, yy, data);
+    }
+    drawNode(forceMagnitude) {	// forceMagnitude is between 0 and 100 inclusive
+	let hueValue = Math.floor(Math.random()*360);
+	let saturationValue = 0;
+	let lightnessValue = 100 - forceMagnitude;
+	this.element.style.background = "hsl("+ hueValue +", "+ saturationValue +"%, "+ lightnessValue +"%)";
     }
 }
 
