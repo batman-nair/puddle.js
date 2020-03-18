@@ -91,9 +91,7 @@ class NodeBase {
 		if (yChange == 0 && xChange == 0) continue;
 		let node = this.data.getNode(this.xx + xChange, this.yy + yChange);
 		if (node == undefined) continue;
-		// console.log("updated forces from(", node.xx, ", ", node.yy, "): ", this.nextFy, this.nextFx);
 		if (node.omniForce != 0) {
-		    // console.log("omniforce guy");
 		    this.updateForces(xChange, yChange, -xChange*node.omniForce, -yChange*node.omniForce);
 		}
 		else {
@@ -112,7 +110,6 @@ class NodeBase {
 		}
 	    }
 	}
-	// console.log("final force: (", this.xx, ", ", this.yy, ") ", this.nextFx, " : ", this.nextFy);
 	if (this.nextFx != 0 || this.nextFy != 0) {
 	    for (let yChange = 0; yChange <= (this.nextFy!=0); ++yChange) {
 		for (let xChange = 0; xChange <= (this.nextFx!=0); ++xChange) {
@@ -142,7 +139,6 @@ class NodeBase {
 	this.data.addToUpdateQueue(this.xx, this.yy+1);
     }
     computeForceAndDrawNodeAnair() {
-	// console.log("fx: ", this.fx, "fy: ", this.fy, "nfx: ", this.nextFx, "nfy: ", this.nextFy);
 	this.omniForce = 0;
 	this.fx = Math.floor(this.nextFx * this.data.forceDampeningRatio);
 	this.fy = Math.floor(this.nextFy * this.data.forceDampeningRatio);
@@ -248,13 +244,11 @@ class AsciiRippleData {
 	return this.nodeList[ yy*this.numCols + xx ];
     }
     addToUpdateQueue(xx, yy) {
-	// console.log("Trying adding to update queue: ", xx, " : ", yy);
 	if (xx < 0 || xx >= this.numCols ||
 	    yy < 0 || yy >= this.numRows)
 	    return;
 	let index = yy*this.numCols + xx;
 	if (!this.nodeList[index].isAddedToUpdate) {
-	    // console.log("Added to update queue: ", xx, " : ", yy);
 	    this.updateQueue.push(index);
 	    this.nodeList[index].isAddedToUpdate = true;
 	}
@@ -274,7 +268,6 @@ class AsciiRippleData {
     }
     updateElements() {
 	this.isUpdateDone = false;
-	// console.log("Updating elements: ", this.updateQueue);
 	let updateList = this.updateQueue;
 	this.updateQueue = [];
 	for (const index of updateList) {
