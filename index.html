@@ -7,10 +7,12 @@
     <script src="ascii-ripple.js"></script>
     <script>
       var ar = new AsciiRipple("ripple-container", 50, 50);
-      ar.setupGrid("ascii");
-      // ar.setupGrid(nodeType, mathType);
-      // nodeType one of ["water", "party", "ascii", "base"]
-      // mathType one of ["anair", "helias"]
+      ar.setNodeStyle("ascii");
+      ar.setupGrid();
+      // ar.setNodeStyle(nodeType);
+      // nodeStyle one of ["water", "party", "ascii", "base"]
+      // ar.setMathMode(mathMode);
+      // mathMode one of ["anair", "helias"]
 
       // ar.toggleRandomRipples();	// Default False
       // ar.toggleRandomRippleStrength(); // Default True

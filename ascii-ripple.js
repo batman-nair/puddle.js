@@ -1,5 +1,5 @@
 class NodeBase {
-    constructor(xx, yy, data, mathMode="anair") {
+    constructor(xx, yy, data, mathMode) {
 	this.xx = xx;
 	this.yy = yy;
 	this.data = data;
@@ -296,30 +296,42 @@ class AsciiRipple {
 	this.useRandomRippleStrength = true;
 	this.maxRandomRippleStrength = 200;
 	this.isRandomRippleCreated = true;
-	this.nodeType = NodeBase;
+	this.nodeStyle = NodeBase;
+	this.nodeSize = 14;
+	this.mathMode = "anair";
 	this.updateLoop = undefined;
     }
-    setupGrid(nodeStyle="base", mathMode="anair") {
+    setNodeStyle(nodeStyle) {
 	if (nodeStyle === "water")
-	    this.nodeType = WaterNode;
+	    this.nodeStyle = WaterNode;
 	else if (nodeStyle === "party")
-	    this.nodeType = PartyNode;
+	    this.nodeStyle = PartyNode;
 	else if (nodeStyle === "ascii")
-	    this.nodeType = AsciiNode;
+	    this.nodeStyle = AsciiNode;
+	else if (nodeStyle === "base")
+	    this.nodeStyle = NodeBase;
 	else
-	    this.nodeType = NodeBase;
+	    console.log("Invalid nodeStyle value");
+    }
+    setNodeSize(nodeSize) {
+	this.nodeSize = nodeSize;
+    }
+    setMathMode(mathMode) {
+	this.mathMode = mathMode;
+    }
+    setupGrid() {
 	clearInterval(this.updateLoop);
 	this.data.refresh(this.numRows, this.numCols);
 
 	this.parentNode.innerHTML = '';
 	this.parentNode.style.fontFamily = "Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace";
-	this.parentNode.style.fontSize = "14px";
+	this.parentNode.style.fontSize = this.nodeSize+2 + "px";
 	this.parentNode.style.display = "grid";
-	this.parentNode.style.gridTemplateColumns = "repeat(" + this.numCols + ", 12px)"; // Make these Node static constants
-	this.parentNode.style.gridTemplateRows = "repeat(" + this.numRows + ", 12px)";
+	this.parentNode.style.gridTemplateColumns = "repeat("+this.numCols+", "+this.nodeSize+"px)";
+	this.parentNode.style.gridTemplateRows = "repeat("+this.numRows+", "+this.nodeSize+"px)";
 	for (let yy = 0; yy < this.numRows; ++yy) {
 	    for (let xx = 0; xx < this.numCols; ++xx) {
-		let node = new this.nodeType(xx, yy, this.data, mathMode);
+		let node = new this.nodeStyle(xx, yy, this.data, this.mathMode);
 		this.data.appendNode(node);
 		this.parentNode.appendChild(node.getNodeElement());
 	    }
