@@ -65,8 +65,8 @@ class NodeBase {
 	    this.nextFx += xForce;
 	}
 	else {
-	    this.nextFy += yForce * 0.7;
-	    this.nextFx += xForce * 0.7;
+	    this.nextFy += yForce >> 1;
+	    this.nextFx += xForce >> 1;
 	}
     }
     updateNodeHelias() {
@@ -78,7 +78,6 @@ class NodeBase {
 	let nodeRightForce = nodeRight? nodeRight.currentForce : 0;
 	let nodeLeft = this.data.getNode(this.xx - 1, this.yy);
 	let nodeLeftForce = nodeLeft? nodeLeft.currentForce : 0;
-
 
 	this.nextForce = (nodeUpForce + nodeDownForce + nodeRightForce + nodeLeftForce)/2 -this.nextForce;
 	this.nextForce = this.nextForce * this.data.forceDampeningRatio;
@@ -284,10 +283,8 @@ class AsciiRippleData {
 }
 
 class AsciiRipple {
-    constructor(elementID, numCols, numRows, updateInterval=100) {
+    constructor(elementID, updateInterval=100) {
 	this.parentNode = document.getElementById(elementID);
-	this.numRows = numRows;
-	this.numCols = numCols;
 	this.data = new AsciiRippleData(this.numRows, this.numCols);
 	this.areRandomRipplesGenerated = false;
 	this.updateInterval = updateInterval;
@@ -300,6 +297,7 @@ class AsciiRipple {
 	this.nodeSize = 14;
 	this.mathMode = "anair";
 	this.updateLoop = undefined;
+	this.setupDefaultOptions();
     }
     setNodeStyle(nodeStyle) {
 	if (nodeStyle === "water")
@@ -312,12 +310,25 @@ class AsciiRipple {
 	    this.nodeStyle = NodeBase;
 	else
 	    console.log("Invalid nodeStyle value");
+	this.setupGrid();
     }
     setNodeSize(nodeSize) {
 	this.nodeSize = nodeSize;
+	this.setupGrid();
     }
     setMathMode(mathMode) {
 	this.mathMode = mathMode;
+	this.setupGrid();
+    }
+    setupDefaultOptions() {
+	let elementWidth = this.parentNode.scrollWidth;
+	let elementHeight = this.parentNode.scrollHeight;
+	let lesserDimension = elementHeight < elementWidth? elementHeight : elementWidth;
+	this.nodeSize = lesserDimension * 3 / 100;
+	if (elementHeight) {
+	    this.numRows = Math.floor(elementHeight/this.nodeSize);
+	    this.numCols = Math.floor(elementWidth/this.nodeSize);
+	}
     }
     setupGrid() {
 	clearInterval(this.updateLoop);
