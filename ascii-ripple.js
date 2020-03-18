@@ -1,14 +1,27 @@
 class NodeBase {
-    constructor(xx, yy, data) {
+    constructor(xx, yy, data, mathMode="anair") {
 	this.xx = xx;
 	this.yy = yy;
 	this.data = data;
+	this.mathMode = mathMode
 
 	this.omniForce = 0; // Force in all directions
 	this.fx = 0;
 	this.fy = 0;
 	this.nextFx = 0;
 	this.nextFy = 0;
+	this.currentForce = 0;
+	this.nextForce = 0;
+
+	if (mathMode === "helias") {
+	    this.updateNode = this.updateNodeHelias;
+	    this.computeForceAndDrawNode = this.computeForceAndDrawNodeHelias;
+	}
+	else {
+	    this.updateNode = this.updateNodeAnair;
+	    this.computeForceAndDrawNode = this.computeForceAndDrawNodeAnair;
+	}
+
 	this.isAddedToUpdate = false;
 	this.isMoveForceDelayComplete = true;
     }
@@ -34,9 +47,12 @@ class NodeBase {
 	this.applyListeners();
 	return this.element;
     }
-    startRipple(rippleStrength = 100.0) {
-	this.omniForce = rippleStrength;
-	this.drawNode(rippleStrength);
+    startRipple() {
+	this.omniForce = this.data.rippleStrength;
+	this.currentForce = this.data.rippleStrength;
+
+	this.drawNode(this.data.rippleStrength);
+
 	for (let yChange = -1; yChange <=1; ++yChange) {
 	    for (let xChange = -1; xChange <=1; ++xChange) {
 		this.data.addToUpdateQueue(this.xx+xChange, this.yy+yChange);
@@ -52,9 +68,24 @@ class NodeBase {
 	    this.nextFy += yForce * 0.7;
 	    this.nextFx += xForce * 0.7;
 	}
-	// console.log("updated forces to: ", this.nextFy, this.nextFx);
     }
-    updateNode() {
+    updateNodeHelias() {
+	let nodeUp = this.data.getNode(this.xx, this.yy - 1);
+	let nodeUpForce = nodeUp? nodeUp.currentForce : 0;
+	let nodeDown = this.data.getNode(this.xx, this.yy + 1);
+	let nodeDownForce = nodeDown? nodeDown.currentForce : 0;
+	let nodeRight = this.data.getNode(this.xx + 1, this.yy);
+	let nodeRightForce = nodeRight? nodeRight.currentForce : 0;
+	let nodeLeft = this.data.getNode(this.xx - 1, this.yy);
+	let nodeLeftForce = nodeLeft? nodeLeft.currentForce : 0;
+
+
+	this.nextForce = (nodeUpForce + nodeDownForce + nodeRightForce + nodeLeftForce)/2 -this.nextForce;
+	this.nextForce = this.nextForce * this.data.forceDampeningRatio;
+
+	this.data.addToDrawQueue(this.xx, this.yy);
+    }
+    updateNodeAnair() {
 	for (let yChange = -1; yChange <=1; ++yChange) {
 	    for (let xChange = -1; xChange <=1; ++xChange) {
 		if (yChange == 0 && xChange == 0) continue;
@@ -92,13 +123,28 @@ class NodeBase {
 	}
 	this.data.addToDrawQueue(this.xx, this.yy);
     }
-    drawNode(forceMagnitude) {	// forceMagnitude is between 0 and 100 inclusive
+    drawNode(forceMagnitude) {
 	let hueValue = 0;
 	let saturationValue = 0;
 	let lightnessValue = 25 + forceMagnitude/2;
 	this.element.style.background = "hsl("+ hueValue +", "+ saturationValue +"%, "+ lightnessValue +"%)";
     }
-    computeForceAndDrawNode() {
+    computeForceAndDrawNodeHelias() {
+	if (this.nextForce < this.data.minForceMagnitude) this.data.minForceMagnitude = this.nextForce;
+	else if (this.nextForce > this.data.maxForceMagnitude) this.data.maxForceMagnitude = this.nextForce;
+
+	if (Math.abs(this.nextForce) < 2) this.nextForce = 0;
+	this.drawNode(this.nextForce);
+	let temp = this.currentForce;
+	this.currentForce = this.nextForce;
+	this.nextForce = temp;
+
+	this.data.addToUpdateQueue(this.xx-1, this.yy);
+	this.data.addToUpdateQueue(this.xx+1, this.yy);
+	this.data.addToUpdateQueue(this.xx, this.yy-1);
+	this.data.addToUpdateQueue(this.xx, this.yy+1);
+    }
+    computeForceAndDrawNodeAnair() {
 	// console.log("fx: ", this.fx, "fy: ", this.fy, "nfx: ", this.nextFx, "nfy: ", this.nextFy);
 	this.omniForce = 0;
 	this.fx = Math.floor(this.nextFx * this.data.forceDampeningRatio);
@@ -129,7 +175,7 @@ class PartyNode extends NodeBase {
     constructor(xx, yy, data) {
 	super(xx, yy, data);
     }
-    drawNode(forceMagnitude) {	// forceMagnitude is between 0 and 100 inclusive
+    drawNode(forceMagnitude) {
 	let hueValue = Math.floor(Math.random()*360);
 	let saturationValue = 0;
 	let lightnessValue = 100 - forceMagnitude;
@@ -145,17 +191,28 @@ class AsciiNode extends NodeBase {
 	for (let index = 0; index < this.asciiShades.length; ++index) {
 	    this.asciiThreshold.push(index * 100.0/(this.asciiShades.length-1));
 	}
+	if (this.mathMode === "helias")
+	    this.drawNode = this.drawNodeHelias;
+	else
+	    this.drawNode = this.drawNodeAnair;
     }
     getNodeElement() {
 	this.element = document.createElement("p");
 	this.element.style.display = "block";
 	this.element.style.width = "100%";
 	this.element.style.height = "100%";
-	this.element.innerText = ".";
+	this.drawNode(0);
 	this.applyListeners();
 	return this.element;
     }
-    drawNode(forceMagnitude) {
+    drawNodeHelias(forceMagnitude) {
+	if (forceMagnitude > 80) forceMagnitude = 80;
+	else if (forceMagnitude < -20) forceMagnitude = -20;
+	forceMagnitude += 20;
+	let index = this.asciiThreshold.findIndex((el) => el >= forceMagnitude);
+	this.element.innerText = this.asciiShades[index];
+    }
+    drawNodeAnair(forceMagnitude) {
 	let index = this.asciiThreshold.findIndex((el) => el >= forceMagnitude);
 	this.element.innerText = this.asciiShades[index];
     }
@@ -171,6 +228,10 @@ class AsciiRippleData {
 	this.numRows = numRows;
 	this.numCols = numCols;
 
+	this.maxForceMagnitude = 0;
+	this.minForceMagnitude = 0;
+
+	this.rippleStrength = 100.0;
 	this.forceDampeningRatio = 0.8; // Force dampening percent
 	this.forceCutOff = 5;	// Axial force less than this is set to 0
 	this.rippleOnMove = false;
@@ -275,7 +336,8 @@ class AsciiRipple {
     createRandomRipple() {
 	let rippleStrength = Math.floor(Math.random()*this.maxRandomRippleStrength);
 	let randomIndex = Math.floor(Math.random()*this.data.nodeList.length);
-	this.data.nodeList[randomIndex].startRipple(rippleStrength);
+	this.data.rippleStrength = rippleStrength;
+	this.data.nodeList[randomIndex].startRipple();
     }
     createTimedRandomRipple() {
 	this.isRandomRippleCreated = false;
