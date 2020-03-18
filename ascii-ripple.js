@@ -13,7 +13,7 @@ class NodeBase {
 	this.currentForce = 0;
 	this.nextForce = 0;
 
-	if (mathMode === "helias") {
+	if (this.mathMode === "helias") {
 	    this.updateNode = this.updateNodeHelias;
 	    this.computeForceAndDrawNode = this.computeForceAndDrawNodeHelias;
 	}
@@ -130,9 +130,6 @@ class NodeBase {
 	this.element.style.background = "hsl("+ hueValue +", "+ saturationValue +"%, "+ lightnessValue +"%)";
     }
     computeForceAndDrawNodeHelias() {
-	if (this.nextForce < this.data.minForceMagnitude) this.data.minForceMagnitude = this.nextForce;
-	else if (this.nextForce > this.data.maxForceMagnitude) this.data.maxForceMagnitude = this.nextForce;
-
 	if (Math.abs(this.nextForce) < 2) this.nextForce = 0;
 	this.drawNode(this.nextForce);
 	let temp = this.currentForce;
@@ -160,8 +157,8 @@ class NodeBase {
 }
 
 class WaterNode extends NodeBase {
-    constructor(xx, yy, data) {
-	super(xx, yy, data);
+    constructor(xx, yy, data, mathMode) {
+	super(xx, yy, data, mathMode);
     }
     drawNode(forceMagnitude) {	// forceMagnitude is between 0 and 100 inclusive
 	let hueValue = 198;
@@ -172,20 +169,20 @@ class WaterNode extends NodeBase {
 }
 
 class PartyNode extends NodeBase {
-    constructor(xx, yy, data) {
-	super(xx, yy, data);
+    constructor(xx, yy, data, mathMode) {
+	super(xx, yy, data, mathMode);
     }
     drawNode(forceMagnitude) {
 	let hueValue = Math.floor(Math.random()*360);
-	let saturationValue = 0;
-	let lightnessValue = 100 - forceMagnitude;
+	let saturationValue = 70 + forceMagnitude/4;
+	let lightnessValue = 100 - (forceMagnitude/2);
 	this.element.style.background = "hsl("+ hueValue +", "+ saturationValue +"%, "+ lightnessValue +"%)";
     }
 }
 
 class AsciiNode extends NodeBase {
-    constructor(xx, yy, data) {
-	super(xx, yy, data);
+    constructor(xx, yy, data, mathMode) {
+	super(xx, yy, data, mathMode);
 	this.asciiShades = [...".,:;+cCOG@M"];
 	this.asciiThreshold = [];
 	for (let index = 0; index < this.asciiShades.length; ++index) {
@@ -228,13 +225,18 @@ class AsciiRippleData {
 	this.numRows = numRows;
 	this.numCols = numCols;
 
-	this.maxForceMagnitude = 0;
-	this.minForceMagnitude = 0;
-
 	this.rippleStrength = 100.0;
 	this.forceDampeningRatio = 0.8; // Force dampening percent
 	this.forceCutOff = 5;	// Axial force less than this is set to 0
 	this.rippleOnMove = false;
+    }
+    refresh(numRows, numCols) {
+	this.nodeList = [];
+	this.updateQueue = [];
+	this.drawQueue = [];
+	this.isUpdateDone = true;
+	this.numRows = numRows;
+	this.numCols = numCols;
     }
     appendNode(node) {
 	this.nodeList.push(node);
@@ -293,18 +295,30 @@ class AsciiRipple {
 	this.parentNode = document.getElementById(elementID);
 	this.numRows = numRows;
 	this.numCols = numCols;
-	this.data = new AsciiRippleData(numRows, numCols);
+	this.data = new AsciiRippleData(this.numRows, this.numCols);
 	this.areRandomRipplesGenerated = false;
-	this.randomGenerationInterval = updateInterval;
-	this.randomTimeRange = updateInterval;
+	this.updateInterval = updateInterval;
+	this.randomGenerationInterval = this.updateInterval;
+	this.randomTimeRange = this.updateInterval;
 	this.useRandomRippleStrength = true;
 	this.maxRandomRippleStrength = 200;
 	this.isRandomRippleCreated = true;
-
-	this.setupGrid();
-	setInterval(() => this.tryUpdateElements(), updateInterval);
+	this.nodeType = NodeBase;
+	this.updateLoop = undefined;
     }
-    setupGrid() {
+    setupGrid(nodeStyle="base", mathMode="anair") {
+	if (nodeStyle === "water")
+	    this.nodeType = WaterNode;
+	else if (nodeStyle === "party")
+	    this.nodeType = PartyNode;
+	else if (nodeStyle === "ascii")
+	    this.nodeType = AsciiNode;
+	else
+	    this.nodeType = NodeBase;
+	clearInterval(this.updateLoop);
+	this.data.refresh(this.numRows, this.numCols);
+
+	this.parentNode.innerHTML = '';
 	this.parentNode.style.fontFamily = "Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace";
 	this.parentNode.style.fontSize = "14px";
 	this.parentNode.style.display = "grid";
@@ -312,11 +326,13 @@ class AsciiRipple {
 	this.parentNode.style.gridTemplateRows = "repeat(" + this.numRows + ", 12px)";
 	for (let yy = 0; yy < this.numRows; ++yy) {
 	    for (let xx = 0; xx < this.numCols; ++xx) {
-		let node = new AsciiNode(xx, yy, this.data);
+		let node = new this.nodeType(xx, yy, this.data, mathMode);
 		this.data.appendNode(node);
 		this.parentNode.appendChild(node.getNodeElement());
 	    }
 	}
+
+	this.updateLoop = setInterval(() => this.tryUpdateElements(), this.updateInterval);
     }
     toggleRandomRipples() {
 	this.areRandomRipplesGenerated = !this.areRandomRipplesGenerated;
