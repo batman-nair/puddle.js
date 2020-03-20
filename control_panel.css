@@ -1,0 +1,37 @@
+.controller-container {
+    position: absolute;
+    width: 200px;
+    right: 20px;
+    top: 10vh;
+    padding: 5px;
+
+    border: 1px solid black;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.5);
+
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-row-gap: 15px;
+    grid-column-gap: 5px;
+}
+.controller-section {
+    grid-column: span 2;
+}
+.section-title {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+.section-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-row-gap: 5px;
+    grid-column-gap: 5px;
+    transition: max-height 0.5s, opacity 0.5s;
+}
+.control-label {
+    text-align: center;
+}
+.control-value {
+    max-width: 90px;
+}

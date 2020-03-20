@@ -155,7 +155,7 @@ class WaterNode extends NodeBase {
     constructor(xx, yy, data, mathMode) {
 	super(xx, yy, data, mathMode);
     }
-    drawNode(forceMagnitude) {	// forceMagnitude is between 0 and 100 inclusive
+    drawNode(forceMagnitude) {
 	let hueValue = 198;
 	let saturationValue = 70 + forceMagnitude/4;
 	let lightnessValue = 70 + (forceMagnitude)/8;
@@ -205,6 +205,8 @@ class AsciiNode extends NodeBase {
 	this.element.innerText = this.asciiShades[index];
     }
     drawNodeAnair(forceMagnitude) {
+	if (forceMagnitude > 100) forceMagnitude = 100;
+	else if (forceMagnitude < 0) forceMagnitude = 0;
 	let index = this.asciiThreshold.findIndex((el) => el >= forceMagnitude);
 	this.element.innerText = this.asciiShades[index];
     }
@@ -314,6 +316,10 @@ class AsciiRipple {
     }
     setNodeSize(nodeSize) {
 	this.nodeSize = nodeSize;
+	if (this.elementHeight) {
+	    this.numRows = Math.floor(this.elementHeight/this.nodeSize);
+	    this.numCols = Math.floor(this.elementWidth/this.nodeSize);
+	}
 	this.setupGrid();
     }
     setMathMode(mathMode) {
@@ -321,13 +327,13 @@ class AsciiRipple {
 	this.setupGrid();
     }
     setupDefaultOptions() {
-	let elementWidth = this.parentNode.scrollWidth;
-	let elementHeight = this.parentNode.scrollHeight;
-	let lesserDimension = elementHeight < elementWidth? elementHeight : elementWidth;
+	this.elementWidth = this.parentNode.scrollWidth;
+	this.elementHeight = this.parentNode.scrollHeight;
+	let lesserDimension = this.elementHeight < this.elementWidth? this.elementHeight : this.elementWidth;
 	this.nodeSize = lesserDimension * 3 / 100;
-	if (elementHeight) {
-	    this.numRows = Math.floor(elementHeight/this.nodeSize);
-	    this.numCols = Math.floor(elementWidth/this.nodeSize);
+	if (this.elementHeight) {
+	    this.numRows = Math.floor(this.elementHeight/this.nodeSize);
+	    this.numCols = Math.floor(this.elementWidth/this.nodeSize);
 	}
     }
     setupGrid() {
@@ -356,6 +362,9 @@ class AsciiRipple {
     toggleRandomRippleStrength() {
 	this.useRandomRippleStrength = !this.useRandomRippleStrength;
     }
+    setMaxRandomRippleStrength(maxRippleStrength) {
+	this.data.maxRandomRippleStrength = maxRippleStrength;
+    }
     setRandomRippleGenerationInterval(randomRippleGenerationInterval) {
 	this.randomGenerationInterval = randomRippleGenerationInterval;
     }
@@ -365,6 +374,15 @@ class AsciiRipple {
     setDampeningRatio(dampeningRatio) {
 	this.data.forceDampeningRatio = dampeningRatio;
     }
+    setRippleStrength(rippleStrength) {
+	this.data.rippleStrength = rippleStrength;
+    }
+    setUpdateInterval(updateInterval) {
+	clearInterval(this.updateLoop);
+	this.updateInterval = updateInterval;
+	this.updateLoop = setInterval(() => this.tryUpdateElements(), this.updateInterval);
+    }
+
     createRandomRipple() {
 	let rippleStrength = Math.floor(Math.random()*this.maxRandomRippleStrength);
 	let randomIndex = Math.floor(Math.random()*this.data.nodeList.length);
@@ -398,3 +416,30 @@ class AsciiRipple {
 	    this.createTimedRandomRipple();
     }
 }
+
+
+
+/*
+All options
+ar = new AsciiRipple(<id-of-container>);
+
+ar.setNodeStyle(nodeStyle);  // nodeStyle one of ["water", "party", "ascii", "base"]  // Default "ascii"
+ar.setMathMode(mathMode);  // mathMode one of ["anair", "helias"]   // Default "anair"
+ar.setNodeSize(nodeSize);  // Default 3% of min(height, width)
+ar.setUpdateInterval(updateInterval);  // Default 100
+
+ar.toggleRandomRipples();	// Default False
+ar.toggleRandomRippleStrength(); // Default True
+ar.setMaxRandomRippleStrength(rippleStrength);  // Default 200
+ar.setRandomRippleGenerationInterval(100); // Default updateInterval  min: updateInterval
+ar.setRandomRippleTimeRange(100);		  // Default updateInterval  max: updateInterval
+// Random ripples are generated at RippleGenerationInterval (+/-) RippleTimeRange/2
+
+ar.createRandomRipple();
+ar.createWave();
+
+ar.setDampeningRatio(0.9); // Default 0.8  between 0 and 1
+
+ar.toggleRippleOnMove(); // Default False
+
+*/
