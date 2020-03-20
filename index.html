@@ -75,7 +75,7 @@
       var cp = new ControlPanel();
       cp.addOptionControl("Node Style: ", {"list": ["base", "ascii", "water", "party"], "default": "ascii", "cb": (val) => {ar.setNodeStyle(val)}});
       cp.addOptionControl("Math Mode: ", {"list": ["anair", "helias"], "default": "anair", "cb": (val) => {ar.setMathMode(val)}});
-      cp.addSliderControl("Node Size: ", {"min": 5, "max": 20, "value": ar.getNodeSize(), "cb": (val) => {ar.setNodeSize(parseInt(val));} });
+      cp.addSliderControl("Node Size: ", {"min": 5, "max": 20, "step": 0.1, "value": ar.getNodeSize(), "cb": (val) => {ar.setNodeSize(parseFloat(val));} });
       cp.addSliderControl("Frame Rate: ", {"min": 10, "max": 1000, "value": 100, "cb": (val) => {ar.setUpdateInterval(parseInt(val));} });
       cp.addNumberControl("Dampening: ", {"min": 0, "max": 1, "step": 0.01, "value": 0.8, "cb": (val) => {ar.setDampeningRatio(parseFloat(val));} });
       cp.addBoolControl("Rand Ripples: ", {"default": false, "cb": (val) => { ar.toggleRandomRipples(); }});
