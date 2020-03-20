@@ -39,6 +39,8 @@ class ControlPanel {
 	    controlValue.min = options["min"];
 	if (options.hasOwnProperty("max"))
 	    controlValue.max = options["max"];
+	if (options.hasOwnProperty("step"))
+	    controlValue.step = options["step"];
 	if (options.hasOwnProperty("value"))
 	    controlValue.value = options["value"];
 	if (options.hasOwnProperty("cb"))

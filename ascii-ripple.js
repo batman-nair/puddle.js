@@ -225,7 +225,7 @@ class AsciiRippleData {
 	this.rippleStrength = 100.0;
 	this.forceDampeningRatio = 0.8; // Force dampening percent
 	this.forceCutOff = 5;	// Axial force less than this is set to 0
-	this.rippleOnMove = false;
+	this.rippleOnMove = true;
     }
     refresh(numRows, numCols) {
 	this.nodeList = [];
@@ -313,6 +313,9 @@ class AsciiRipple {
 	else
 	    console.log("Invalid nodeStyle value");
 	this.setupGrid();
+    }
+    getNodeSize() {
+	return this.nodeSize;
     }
     setNodeSize(nodeSize) {
 	this.nodeSize = nodeSize;
@@ -440,6 +443,6 @@ ar.createWave();
 
 ar.setDampeningRatio(0.9); // Default 0.8  between 0 and 1
 
-ar.toggleRippleOnMove(); // Default False
+ar.toggleRippleOnMove(); // Default True
 
 */
