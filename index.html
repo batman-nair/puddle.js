@@ -2,9 +2,9 @@
 <html>
   <body>
     <link href="https://fonts.googleapis.com/css?family=Fira+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="control_panel.css">
+    <link rel="stylesheet" type="text/css" href="control-panel.css">
     <style>
-      #ripple-container {
+      #puddle-container {
 	  position: relative;
 	  top: 45vh;
 	  transform: translateY(-50%);
@@ -13,50 +13,50 @@
 	  margin: 0 auto;
       }
     </style>
-    <div id="ripple-container">
+    <div id="puddle-container">
     </div>
 
-    <script src="ascii-ripple.js"></script>
+    <script src="puddle.js"></script>
     <script src="control-panel.js"></script>
     <script src="mobile-check.js"></script>
     <script>
       let isTouchDevice = window.mobileAndTabletcheck();
 
-      var ar = new AsciiRipple("ripple-container");
-      ar.setNodeStyle("ascii");
-      ar.setupGrid();
+      var puddle = new Puddle("puddle-container");
+      puddle.setNodeStyle("ascii");
+      puddle.setupGrid();
       let defaultMathMode = "anair";
       let defaultMaxRippleStrength = 100;
-      if (isTouchDevice) {
+      if (isTouchDevice) { // Better mobile default options
 	  defaultMathMode = "helias";
 	  defaultMaxRippleStrength = 250;
-	  ar.toggleRandomRipples();
-	  ar.setMathMode(defaultMathMode);
-	  ar.setMaxRippleStrength(defaultMaxRippleStrength);
-	  ar.toggleRippleOnMove();
+	  puddle.toggleRandomRipples();
+	  puddle.setMathMode(defaultMathMode);
+	  puddle.setMaxRippleStrength(defaultMaxRippleStrength);
+	  puddle.toggleRippleOnMove();
       }
 
 
-      var cp = new ControlPanel();
-      cp.addOptionControl("Node Style: ", {"list": ["base", "ascii", "water", "party"], "default": "ascii", "cb": (val) => {ar.setNodeStyle(val)}});
-      cp.addOptionControl("Math Mode: ", {"list": ["anair", "helias"], "default": defaultMathMode, "cb": (val) => {ar.setMathMode(val)}});
-      cp.addSliderControl("Node Size: ", {"min": 5, "max": 20, "step": 0.1, "value": ar.getNodeSize(), "cb": (val) => {ar.setNodeSize(parseFloat(val));} });
-      cp.addSliderControl("Frame Delay: ", {"min": 10, "max": 1000, "value": 100, "cb": (val) => {ar.setUpdateInterval(parseInt(val));} });
-      cp.addNumberControl("Dampening: ", {"min": 0, "max": 1, "step": 0.01, "value": 0.8, "cb": (val) => {ar.setDampeningRatio(parseFloat(val));} });
-      cp.addSliderControl("Max Strength:", {"min": 0, "max": 400, "value": defaultMaxRippleStrength, "cb": (val) => { ar.setMaxRippleStrength(parseInt(val)); }});
+      var panel = new ControlPanel();
+      panel.addOptionControl("Node Style: ", {"list": ["base", "ascii", "water", "party"], "default": "ascii", "cb": (val) => {puddle.setNodeStyle(val)}});
+      panel.addOptionControl("Math Mode: ", {"list": ["anair", "helias"], "default": defaultMathMode, "cb": (val) => {puddle.setMathMode(val)}});
+      panel.addSliderControl("Node Size: ", {"min": 5, "max": 20, "step": 0.1, "value": puddle.getNodeSize(), "cb": (val) => {puddle.setNodeSize(parseFloat(val));} });
+      panel.addSliderControl("Frame Delay: ", {"min": 10, "max": 1000, "value": 100, "cb": (val) => {puddle.setUpdateInterval(parseInt(val));} });
+      panel.addNumberControl("Dampening: ", {"min": 0, "max": 1, "step": 0.01, "value": 0.8, "cb": (val) => {puddle.setDampeningRatio(parseFloat(val));} });
+      panel.addSliderControl("Max Strength:", {"min": 0, "max": 400, "value": defaultMaxRippleStrength, "cb": (val) => { puddle.setMaxRippleStrength(parseInt(val)); }});
 
-      cp.addBoolControl("Random Ripples: ", {"default": isTouchDevice, "cb": (val) => { ar.toggleRandomRipples(); }});
-      cp.addControlSection("Random Ripple Controls", {id: "randomRippleControls"});
-      cp.addSliderControl("Ripple Delay:", {"min": 10, "max": 1000, "step": 10, "value": 100, "cb": (val) => { ar.setRandomRippleGenerationInterval(parseInt(val)); }}, "randomRippleControls");
-      cp.addSliderControl("Delay Variance:", {"min": 10, "max": 1000, "value": 100, "cb": (val) => { ar.setRandomRippleTimeRange(val); }}, "randomRippleControls");
+      panel.addBoolControl("Random Ripples: ", {"default": isTouchDevice, "cb": (val) => { puddle.toggleRandomRipples(); }});
+      panel.addControlSection("Random Ripple Controls", {id: "randomRippleControls"});
+      panel.addSliderControl("Ripple Delay:", {"min": 10, "max": 1000, "step": 10, "value": 100, "cb": (val) => { puddle.setRandomRippleGenerationInterval(parseInt(val)); }}, "randomRippleControls");
+      panel.addSliderControl("Delay Variance:", {"min": 10, "max": 1000, "value": 100, "cb": (val) => { puddle.setRandomRippleTimeRange(val); }}, "randomRippleControls");
 
       if (!isTouchDevice) // touchmove doesn't work as well as mousemove so can't use that
-	  cp.addBoolControl("Ripple on Move:", {"default": true, "disabled": false, "cb": (val) => { ar.toggleRippleOnMove(); }});
+	  panel.addBoolControl("Ripple on Move:", {"default": true, "disabled": false, "cb": (val) => { puddle.toggleRippleOnMove(); }});
 
-      cp.addButtonControl("Create Ripple!", {"cb": () => ar.createRandomRipple()});
-      cp.addButtonControl("Create Wave!", {"cb": () => ar.createWave()});
+      panel.addButtonControl("Create Ripple!", {"cb": () => puddle.createRandomRipple()});
+      panel.addButtonControl("Create Wave!", {"cb": () => puddle.createWave()});
 
-      cp.show();
+      panel.show();
 
     </script>
 

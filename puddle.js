@@ -131,7 +131,7 @@ class NodeBase {
 	this.element.style.background = "hsl("+ hueValue +", "+ saturationValue +"%, "+ lightnessValue +"%)";
     }
     computeForceAndDrawNodeHelias() {
-	if (Math.abs(this.nextForce) < 2) this.nextForce = 0;
+	if (Math.abs(this.nextForce) < this.data.forceCutOff) this.nextForce = 0;
 	this.drawNode(this.nextForce);
 	let temp = this.currentForce;
 	this.currentForce = this.nextForce;
@@ -221,8 +221,7 @@ class AsciiNode extends NodeBase {
     }
 }
 
-
-class AsciiRippleData {
+class PuddleData {
     constructor(numRows, numCols) {
 	this.nodeList = [];
 	this.updateQueue = [];
@@ -233,7 +232,7 @@ class AsciiRippleData {
 
 	this.maxRippleStrength = 100.0;
 	this.forceDampeningRatio = 0.8; // Force dampening percent
-	this.forceCutOff = 5;	// Axial force less than this is set to 0
+	this.forceCutOff = 2;	// Axial force less than this is set to 0
 	this.rippleOnMove = true;
     }
     refresh(numRows, numCols) {
@@ -293,10 +292,10 @@ class AsciiRippleData {
     }
 }
 
-class AsciiRipple {
+class Puddle {
     constructor(elementID, updateInterval=100) {
 	this.parentNode = document.getElementById(elementID);
-	this.data = new AsciiRippleData(this.numRows, this.numCols);
+	this.data = new PuddleData(this.numRows, this.numCols);
 	this.areRandomRipplesGenerated = false;
 	this.updateInterval = updateInterval;
 	this.randomGenerationInterval = this.updateInterval;
@@ -387,19 +386,14 @@ class AsciiRipple {
     setDampeningRatio(dampeningRatio) {
 	this.data.forceDampeningRatio = dampeningRatio;
     }
-    // setRippleStrength(rippleStrength) {
-    // 	this.data.rippleStrength = rippleStrength;
-    // }
     setUpdateInterval(updateInterval) {
 	clearInterval(this.updateLoop);
 	this.updateInterval = updateInterval;
 	this.updateLoop = setInterval(() => this.tryUpdateElements(), this.updateInterval);
     }
-
     createRandomRipple() {
 	let rippleStrength = Math.floor(Math.random()*this.data.maxRippleStrength);
 	let randomIndex = Math.floor(Math.random()*this.data.nodeList.length);
-	// this.data.rippleStrength = rippleStrength;
 	this.data.nodeList[randomIndex].startRipple(rippleStrength);
     }
     createTimedRandomRipple() {
@@ -434,25 +428,25 @@ class AsciiRipple {
 
 /*
 All options
-ar = new AsciiRipple(<id-of-container>);
+puddle = new Puddle(<id-of-container>);
 
-ar.setNodeStyle(nodeStyle);  // nodeStyle one of ["water", "party", "ascii", "base"]  // Default "ascii"
-ar.setMathMode(mathMode);  // mathMode one of ["anair", "helias"]   // Default "anair"
-ar.setNodeSize(nodeSize);  // Default 3% of min(height, width)
-ar.setUpdateInterval(updateInterval);  // Default 100
+puddle.setNodeStyle(nodeStyle);  // nodeStyle one of ["water", "party", "ascii", "base"]  // Default "ascii"
+puddle.setMathMode(mathMode);  // mathMode one of ["anair", "helias"]   // Default "anair"
+puddle.setNodeSize(nodeSize);  // Default 3% of min(height, width)
+puddle.setUpdateInterval(updateInterval);  // Default 100
 
-ar.toggleRandomRipples();	// Default False
-ar.toggleRandomRippleStrength(); // Default True
-ar.setMaxRandomRippleStrength(rippleStrength);  // Default 200
-ar.setRandomRippleGenerationInterval(100); // Default updateInterval  min: updateInterval
-ar.setRandomRippleTimeRange(100);		  // Default updateInterval  max: updateInterval
+puddle.toggleRandomRipples();	// Default False
+puddle.toggleRandomRippleStrength(); // Default True
+puddle.setMaxRippleStrength(rippleStrength);  // Default 100
+puddle.setRandomRippleGenerationInterval(100); // Default updateInterval  min: updateInterval
+puddle.setRandomRippleTimeRange(100);		  // Default updateInterval  max: updateInterval
 // Random ripples are generated at RippleGenerationInterval (+/-) RippleTimeRange/2
 
-ar.createRandomRipple();
-ar.createWave();
+puddle.createRandomRipple();
+puddle.createWave();
 
-ar.setDampeningRatio(0.9); // Default 0.8  between 0 and 1
+puddle.setDampeningRatio(0.9); // Default 0.8  between 0 and 1
 
-ar.toggleRippleOnMove(); // Default True
+puddle.toggleRippleOnMove(); // Default True
 
 */
