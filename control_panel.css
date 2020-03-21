@@ -6,7 +6,7 @@
 
     border-radius: 5px;
     background: rgba(100, 0, 0, 0.9);
-    font-family: "Lucida Console", Monaco, monospace;
+    font-family: 'Fira Mono', monospace;
     font-size: 12px;
     color: white;
 }

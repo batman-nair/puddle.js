@@ -352,8 +352,7 @@ class AsciiRipple {
 	this.data.refresh(this.numRows, this.numCols);
 
 	this.parentNode.innerHTML = '';
-	this.parentNode.style.fontFamily = "Lucida Sans Typewriter, Lucida Typewriter, monospace";
-	this.parentNode.style.fontFamily = "Lucida Console, Monaco, monospace";
+	this.parentNode.style.fontFamily = "Fira Mono, monospace";
 	this.parentNode.style.fontSize = this.nodeSize+2 + "px";
 	this.parentNode.style.display = "grid";
 	this.parentNode.style.gridTemplateColumns = "repeat("+this.numCols+", "+this.nodeSize+"px)";
