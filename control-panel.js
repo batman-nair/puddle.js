@@ -1,10 +1,12 @@
 class ControlPanel {
-    constructor() {
+    constructor(name) {
 	this.parentContainer = document.querySelector("body");
 	this.mainContainer = document.createElement("div");
 	this.mainContainer.className = "controller-container";
 	this.controllerMap = {};
 	this.sectionMap = {};
+
+	this.addControlSection("Control Panel", {id: "root"}, "");
     }
     getControlLabel(name) {
 	let controlLabel = document.createElement("span");
@@ -18,7 +20,7 @@ class ControlPanel {
 	    sectionContainer = this.sectionMap[sectionName];
 	sectionContainer.appendChild(element);
     }
-    addNumberControl(name, options, sectionName="") {
+    addNumberControl(name, options, sectionName="root") {
 	let controlLabel = this.getControlLabel(name);
 	let controlValue = document.createElement("input");
 	controlValue.className = "control-value";
@@ -37,7 +39,7 @@ class ControlPanel {
 	this.addElementToController(controlLabel, sectionName);
 	this.addElementToController(controlValue, sectionName);
     }
-    addSliderControl(name, options, sectionName) {
+    addSliderControl(name, options, sectionName="root") {
 	let controlLabel = this.getControlLabel(name);
 	let controlValue = document.createElement("input");
 	controlValue.className = "control-value";
@@ -56,7 +58,7 @@ class ControlPanel {
 	this.addElementToController(controlLabel, sectionName);
 	this.addElementToController(controlValue, sectionName);
     }
-    addOptionControl(name, options, sectionName) {
+    addOptionControl(name, options, sectionName="root") {
 	let controlLabel = this.getControlLabel(name);
 	let controlValue = document.createElement("select");
 	controlValue.className = "control-value";
@@ -79,7 +81,7 @@ class ControlPanel {
 	this.addElementToController(controlLabel, sectionName);
 	this.addElementToController(controlValue, sectionName);
     }
-    addBoolControl(name, options, sectionName) {
+    addBoolControl(name, options, sectionName="root") {
 	let controlLabel = this.getControlLabel(name);
 	let controlValue = document.createElement("input");
 	controlValue.className = "control-value";
@@ -92,16 +94,20 @@ class ControlPanel {
 	this.addElementToController(controlLabel, sectionName);
 	this.addElementToController(controlValue, sectionName);
     }
-    addControlSection(name, options, sectionName) {
+    addControlSection(name, options, sectionName="root") {
 	let sectionContainer = document.createElement("div");
 	sectionContainer.className = "section-container";
 	let sectionTitle = document.createElement("span");
 	sectionTitle.className = "section-title";
 	sectionTitle.innerText = name;
+	let sectionTitleArrow = document.createElement("i");
+	sectionTitleArrow.className = "section-title-arrow";
+	sectionTitle.appendChild(sectionTitleArrow);
 	let controllerContainer = document.createElement("div");
 	controllerContainer.className = "section-controller-container";
 
 	sectionTitle.sectionContainer = sectionContainer;
+	sectionTitle.sectionTitleArrow = sectionTitleArrow;
 	sectionContainer.controllerContainer = controllerContainer;
 	controllerContainer.actualHeight = controllerContainer.scrollHeight;
 	controllerContainer.visible = true;
@@ -111,10 +117,14 @@ class ControlPanel {
 	    if (controllerContainer.visible) {
 		controllerContainer.style.maxHeight = 0;
 		controllerContainer.style.opacity = 0;
+		sectionTitleArrow.style.transform = "rotate(45deg)";
+		sectionTitleArrow.style.marginTop = "4px";
 	    }
 	    else {
 		controllerContainer.style.maxHeight = controllerContainer.actualHeight + "px";
 		controllerContainer.style.opacity = 1;
+		sectionTitleArrow.style.transform = "rotate(-135deg)";
+		sectionTitleArrow.style.marginTop = "7px";
 	    }
 	    controllerContainer.visible = !controllerContainer.visible;
 	};
@@ -122,8 +132,16 @@ class ControlPanel {
 	sectionContainer.appendChild(sectionTitle);
 	sectionContainer.appendChild(controllerContainer);
 
-	this.sectionMap[name] = controllerContainer;
-	this.mainContainer.appendChild(sectionContainer);
+	let sectionId = name;
+	if (options.hasOwnProperty("id"))
+	    sectionId = options["id"];
+	this.sectionMap[sectionId] = controllerContainer;
+	if (!sectionName) {
+	    this.mainContainer.appendChild(sectionContainer);
+	}
+	else {
+	    this.addElementToController(sectionContainer, sectionName);
+	}
     }
     show() {
 	this.parentContainer.appendChild(this.mainContainer);
@@ -133,31 +151,5 @@ class ControlPanel {
 	    controllerContainer.actualHeight = controllerContainer.scrollHeight;
 	    controllerContainer.style.maxHeight = controllerContainer.actualHeight + "px";
 	}
-
     }
 }
-
-// section = document.querySelector(".section-title")
-// sec_cont = document.querySelector(".section-container")
-// let maxHeight = sec_cont.scrollHeight;
-// sec_cont.style.maxHeight = maxHeight + "px";
-// sec_cont.style.opacity = 1;
-// console.log("maxHeight: ", maxHeight);
-
-// visible = true;
-// section.onclick = () => {
-//     console.log("onclick ", visible, " : ", maxHeight);
-//     if (visible) {
-// 	sec_cont.style.maxHeight = "0";
-// 	sec_cont.style.opacity = "0";
-//     }
-//     else {
-// 	sec_cont.style.maxHeight = maxHeight + "px";
-// 	sec_cont.style.opacity = "1";
-//     }
-//     visible = !visible;
-// };
-
-
-// let nodeStyle = document.getElementById("node-style");
-// nodeStyle.onchange = () => { ar.setNodeStyle(nodeStyle.value) };

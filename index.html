@@ -7,7 +7,7 @@
 	  position: relative;
 	  top: 45vh;
 	  transform: translateY(-50%);
-	  width: 80vw;
+	  width: 90vw;
 	  height: 80vh;
 	  margin: 0 auto;
       }
@@ -80,10 +80,10 @@
       cp.addNumberControl("Dampening: ", {"min": 0, "max": 1, "step": 0.01, "value": 0.8, "cb": (val) => {ar.setDampeningRatio(parseFloat(val));} });
       cp.addSliderControl("Max Strength:", {"min": 0, "max": 400, "value": 100, "cb": (val) => { ar.setMaxRippleStrength(parseInt(val)); }});
 
-      cp.addBoolControl("Rand Ripples: ", {"default": false, "cb": (val) => { ar.toggleRandomRipples(); }});
-      cp.addControlSection("Random Ripple Controls");
-      cp.addSliderControl("Ripple Delay:", {"min": 10, "max": 1000, "step": 10, "value": 100, "cb": (val) => { ar.setRandomRippleGenerationInterval(parseInt(val)); }}, "Random Ripple Controls");
-      cp.addSliderControl("Delay Variance:", {"min": 10, "max": 1000, "value": 100, "cb": (val) => { ar.setRandomRippleTimeRange(val); }}, "Random Ripple Controls");
+      cp.addBoolControl("Random Ripples: ", {"default": false, "cb": (val) => { ar.toggleRandomRipples(); }});
+      cp.addControlSection("Random Ripple Controls", {id: "randomRippleControls"});
+      cp.addSliderControl("Ripple Delay:", {"min": 10, "max": 1000, "step": 10, "value": 100, "cb": (val) => { ar.setRandomRippleGenerationInterval(parseInt(val)); }}, "randomRippleControls");
+      cp.addSliderControl("Delay Variance:", {"min": 10, "max": 1000, "value": 100, "cb": (val) => { ar.setRandomRippleTimeRange(val); }}, "randomRippleControls");
 
       cp.addBoolControl("Ripple on Move:", {"default": true, "cb": (val) => { ar.toggleRippleOnMove(); }});
 

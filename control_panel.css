@@ -3,21 +3,14 @@
     width: 200px;
     right: 20px;
     top: 10vh;
-    padding: 15px 5px;
 
-    border: 1px solid black;
     border-radius: 5px;
-    background: rgba(100, 0, 0, 0.7);
+    background: rgba(100, 0, 0, 0.9);
     color: white;
-
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-row-gap: 10px;
-    grid-column-gap: 5px;
 }
 .section-container {
     grid-column: span 2;
-    background: rgba(100, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
     padding: 5px;
 }
@@ -26,6 +19,20 @@
     width: 100%;
     text-align: center;
     margin-bottom: 10px;
+    cursor: pointer;
+}
+.section-title-arrow {
+    /* content: 'ff'; */
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 2px;
+    margin-top: 7px;
+    margin-right: 5px;
+    transform: rotate(-135deg);
+    transition: transform 0.5s;
+
+    float: right;
 }
 .section-controller-container {
     display: grid;
