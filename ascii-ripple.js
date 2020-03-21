@@ -47,11 +47,13 @@ class NodeBase {
 	this.applyListeners();
 	return this.element;
     }
-    startRipple() {
-	this.omniForce = this.data.rippleStrength;
-	this.currentForce = this.data.rippleStrength;
+    startRipple(rippleStrength = 0) {
+	if (!rippleStrength)
+	    rippleStrength = this.data.maxRippleStrength;
+	this.omniForce = rippleStrength;
+	this.currentForce = rippleStrength;
 
-	this.drawNode(this.data.rippleStrength);
+	this.drawNode(rippleStrength);
 
 	for (let yChange = -1; yChange <=1; ++yChange) {
 	    for (let xChange = -1; xChange <=1; ++xChange) {
@@ -120,6 +122,9 @@ class NodeBase {
 	this.data.addToDrawQueue(this.xx, this.yy);
     }
     drawNode(forceMagnitude) {
+	if (forceMagnitude > 150)  forceMagnitude = 150;
+	else if (forceMagnitude < -50)  forceMagnitude = -50;
+
 	let hueValue = 0;
 	let saturationValue = 0;
 	let lightnessValue = 25 + forceMagnitude/2;
@@ -156,6 +161,8 @@ class WaterNode extends NodeBase {
 	super(xx, yy, data, mathMode);
     }
     drawNode(forceMagnitude) {
+	if (forceMagnitude > 120)  forceMagnitude = 120;
+	if (forceMagnitude < -280)  forceMagnitude = -280;
 	let hueValue = 198;
 	let saturationValue = 70 + forceMagnitude/4;
 	let lightnessValue = 70 + (forceMagnitude)/8;
@@ -168,6 +175,8 @@ class PartyNode extends NodeBase {
 	super(xx, yy, data, mathMode);
     }
     drawNode(forceMagnitude) {
+	if (forceMagnitude > 120)  forceMagnitude = 120;
+	if (forceMagnitude < -200)  forceMagnitude = -200;
 	let hueValue = Math.floor(Math.random()*360);
 	let saturationValue = 70 + forceMagnitude/4;
 	let lightnessValue = 100 - (forceMagnitude/2);
@@ -222,7 +231,7 @@ class AsciiRippleData {
 	this.numRows = numRows;
 	this.numCols = numCols;
 
-	this.rippleStrength = 100.0;
+	this.maxRippleStrength = 100.0;
 	this.forceDampeningRatio = 0.8; // Force dampening percent
 	this.forceCutOff = 5;	// Axial force less than this is set to 0
 	this.rippleOnMove = true;
@@ -293,7 +302,6 @@ class AsciiRipple {
 	this.randomGenerationInterval = this.updateInterval;
 	this.randomTimeRange = this.updateInterval;
 	this.useRandomRippleStrength = true;
-	this.maxRandomRippleStrength = 200;
 	this.isRandomRippleCreated = true;
 	this.nodeStyle = NodeBase;
 	this.nodeSize = 14;
@@ -344,7 +352,7 @@ class AsciiRipple {
 	this.data.refresh(this.numRows, this.numCols);
 
 	this.parentNode.innerHTML = '';
-	this.parentNode.style.fontFamily = "Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace";
+	this.parentNode.style.fontFamily = "Lucida Sans Typewriter, Lucida Typewriter, monospace";
 	this.parentNode.style.fontSize = this.nodeSize+2 + "px";
 	this.parentNode.style.display = "grid";
 	this.parentNode.style.gridTemplateColumns = "repeat("+this.numCols+", "+this.nodeSize+"px)";
@@ -365,11 +373,13 @@ class AsciiRipple {
     toggleRandomRippleStrength() {
 	this.useRandomRippleStrength = !this.useRandomRippleStrength;
     }
-    setMaxRandomRippleStrength(maxRippleStrength) {
-	this.data.maxRandomRippleStrength = maxRippleStrength;
+    setMaxRippleStrength(maxRippleStrength) {
+	this.data.maxRippleStrength = maxRippleStrength;
     }
     setRandomRippleGenerationInterval(randomRippleGenerationInterval) {
 	this.randomGenerationInterval = randomRippleGenerationInterval;
+	clearTimeout(this.randomRippleTimeout);
+	this.isRandomRippleCreated = true;
     }
     setRandomRippleTimeRange(randomRippleTimeRange) {
 	this.randomTimeRange = randomRippleTimeRange;
@@ -377,9 +387,9 @@ class AsciiRipple {
     setDampeningRatio(dampeningRatio) {
 	this.data.forceDampeningRatio = dampeningRatio;
     }
-    setRippleStrength(rippleStrength) {
-	this.data.rippleStrength = rippleStrength;
-    }
+    // setRippleStrength(rippleStrength) {
+    // 	this.data.rippleStrength = rippleStrength;
+    // }
     setUpdateInterval(updateInterval) {
 	clearInterval(this.updateLoop);
 	this.updateInterval = updateInterval;
@@ -387,17 +397,17 @@ class AsciiRipple {
     }
 
     createRandomRipple() {
-	let rippleStrength = Math.floor(Math.random()*this.maxRandomRippleStrength);
+	let rippleStrength = Math.floor(Math.random()*this.data.maxRippleStrength);
 	let randomIndex = Math.floor(Math.random()*this.data.nodeList.length);
-	this.data.rippleStrength = rippleStrength;
-	this.data.nodeList[randomIndex].startRipple();
+	// this.data.rippleStrength = rippleStrength;
+	this.data.nodeList[randomIndex].startRipple(rippleStrength);
     }
     createTimedRandomRipple() {
 	this.isRandomRippleCreated = false;
 	let timeoutChange = Math.floor(Math.random()*this.randomTimeRange)
 	    - this.randomTimeRange/2;
 	let timeout = this.randomGenerationInterval + timeoutChange;
-	setTimeout(() => {
+	this.randomRippleTimeout = setTimeout(() => {
 	    this.createRandomRipple();
 	    this.isRandomRippleCreated = true;
 	}, timeout);

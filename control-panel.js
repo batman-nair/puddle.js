@@ -4,6 +4,7 @@ class ControlPanel {
 	this.mainContainer = document.createElement("div");
 	this.mainContainer.className = "controller-container";
 	this.controllerMap = {};
+	this.sectionMap = {};
     }
     getControlLabel(name) {
 	let controlLabel = document.createElement("span");
@@ -11,7 +12,13 @@ class ControlPanel {
 	controlLabel.innerText = name;
 	return controlLabel;
     }
-    addNumberControl(name, options) {
+    addElementToController(element, sectionName) {
+	let sectionContainer = this.mainContainer;
+	if (this.sectionMap.hasOwnProperty(sectionName))
+	    sectionContainer = this.sectionMap[sectionName];
+	sectionContainer.appendChild(element);
+    }
+    addNumberControl(name, options, sectionName="") {
 	let controlLabel = this.getControlLabel(name);
 	let controlValue = document.createElement("input");
 	controlValue.className = "control-value";
@@ -27,10 +34,10 @@ class ControlPanel {
 	if (options.hasOwnProperty("cb"))
 	    controlValue.onchange = (event) => options["cb"](event.target.value);
 
-	this.mainContainer.appendChild(controlLabel);
-	this.mainContainer.appendChild(controlValue);
+	this.addElementToController(controlLabel, sectionName);
+	this.addElementToController(controlValue, sectionName);
     }
-    addSliderControl(name, options) {
+    addSliderControl(name, options, sectionName) {
 	let controlLabel = this.getControlLabel(name);
 	let controlValue = document.createElement("input");
 	controlValue.className = "control-value";
@@ -46,10 +53,10 @@ class ControlPanel {
 	if (options.hasOwnProperty("cb"))
 	    controlValue.onchange = (event) => options["cb"](event.target.value);
 
-	this.mainContainer.appendChild(controlLabel);
-	this.mainContainer.appendChild(controlValue);
+	this.addElementToController(controlLabel, sectionName);
+	this.addElementToController(controlValue, sectionName);
     }
-    addOptionControl(name, options) {
+    addOptionControl(name, options, sectionName) {
 	let controlLabel = this.getControlLabel(name);
 	let controlValue = document.createElement("select");
 	controlValue.className = "control-value";
@@ -69,10 +76,10 @@ class ControlPanel {
 	if (options.hasOwnProperty("cb"))
 	    controlValue.onchange = (event) => options["cb"](event.target.value);
 
-	this.mainContainer.appendChild(controlLabel);
-	this.mainContainer.appendChild(controlValue);
+	this.addElementToController(controlLabel, sectionName);
+	this.addElementToController(controlValue, sectionName);
     }
-    addBoolControl(name, options) {
+    addBoolControl(name, options, sectionName) {
 	let controlLabel = this.getControlLabel(name);
 	let controlValue = document.createElement("input");
 	controlValue.className = "control-value";
@@ -82,13 +89,51 @@ class ControlPanel {
 	if (options.hasOwnProperty("cb"))
 	    controlValue.onchange = (event) => options["cb"](event.target.checked);
 
-	this.mainContainer.appendChild(controlLabel);
-	this.mainContainer.appendChild(controlValue);
-
+	this.addElementToController(controlLabel, sectionName);
+	this.addElementToController(controlValue, sectionName);
     }
+    addControlSection(name, options, sectionName) {
+	let sectionContainer = document.createElement("div");
+	sectionContainer.className = "section-container";
+	let sectionTitle = document.createElement("span");
+	sectionTitle.className = "section-title";
+	sectionTitle.innerText = name;
+	let controllerContainer = document.createElement("div");
+	controllerContainer.className = "section-controller-container";
 
+	sectionTitle.sectionContainer = sectionContainer;
+	sectionContainer.controllerContainer = controllerContainer;
+	controllerContainer.actualHeight = controllerContainer.scrollHeight;
+	controllerContainer.visible = true;
+	sectionTitle.onclick = () => {
+	    let sectionContainer = sectionTitle.sectionContainer;
+	    let controllerContainer = sectionContainer.controllerContainer;
+	    if (controllerContainer.visible) {
+		controllerContainer.style.maxHeight = 0;
+		controllerContainer.style.opacity = 0;
+	    }
+	    else {
+		controllerContainer.style.maxHeight = controllerContainer.actualHeight + "px";
+		controllerContainer.style.opacity = 1;
+	    }
+	    controllerContainer.visible = !controllerContainer.visible;
+	};
+
+	sectionContainer.appendChild(sectionTitle);
+	sectionContainer.appendChild(controllerContainer);
+
+	this.sectionMap[name] = controllerContainer;
+	this.mainContainer.appendChild(sectionContainer);
+    }
     show() {
 	this.parentContainer.appendChild(this.mainContainer);
+
+	for (const sectionName in this.sectionMap) {
+	    let controllerContainer = this.sectionMap[sectionName];
+	    controllerContainer.actualHeight = controllerContainer.scrollHeight;
+	    controllerContainer.style.maxHeight = controllerContainer.actualHeight + "px";
+	}
+
     }
 }
 
