@@ -16,80 +16,42 @@
     <div id="ripple-container">
     </div>
 
-    <!-- <div class="controller-container"> -->
-    <!--   <span class="control-label"> Node Style: </span> -->
-    <!--   <select class="control-value" id="node-style"> -->
-    <!-- 	<option selected="selected"> ascii</option> -->
-    <!-- 	<option> water</option> -->
-    <!--   </select> -->
-    <!--   <span class="control-label"> Math Mode: </span> -->
-    <!--   <select class="control-value"> -->
-    <!-- 	<option> option1</option> -->
-    <!-- 	<option> option2</option> -->
-    <!-- 	<option> option2</option> -->
-    <!--   </select> -->
-
-
-    <!--   <div class="controller-section"> -->
-    <!-- 	<span class="section-title"> Section Title </span> -->
-    <!-- 	<div class="section-container"> -->
-    <!-- 	  <span class="control-label"> Node Size: </span> -->
-    <!-- 	  <input type="number" min="5" max="20" value="14"/> -->
-
-    <!-- 	  <span class="control-label"> Frame Rate: </span> -->
-    <!-- 	  <input class="control-value" type="range" min="10" max="1000" value="100"/> -->
-    <!-- 	</div> -->
-    <!--   </div> -->
-
-    <!--   <span class="control-label"> Node Style: </span> -->
-    <!--   <input type="number" min="5" max="20" value="14"/> -->
-
-    <!--   <span class="control-label"> Node Style: </span> -->
-    <!--   <input type="number" min="5" max="20" value="14"/> -->
-
-    </div>
-
     <script src="ascii-ripple.js"></script>
     <script src="control-panel.js"></script>
     <script src="mobile-check.js"></script>
     <script>
+      let isTouchDevice = window.mobileAndTabletcheck();
+
       var ar = new AsciiRipple("ripple-container");
       ar.setNodeStyle("ascii");
       ar.setupGrid();
-      // ar.setNodeStyle(nodeType);
-      // nodeStyle one of ["water", "party", "ascii", "base"]
-      // ar.setMathMode(mathMode);
-      // mathMode one of ["anair", "helias"]
+      let defaultMathMode = "anair";
+      let defaultMaxRippleStrength = 100;
+      if (isTouchDevice) {
+	  defaultMathMode = "helias";
+	  defaultMaxRippleStrength = 250;
+	  ar.toggleRandomRipples();
+	  ar.setMathMode(defaultMathMode);
+	  ar.setMaxRippleStrength(defaultMaxRippleStrength);
+	  ar.toggleRippleOnMove();
+      }
 
-      // ar.toggleRandomRipples();	// Default False
-      // ar.toggleRandomRippleStrength(); // Default True
-      // ar.setRandomRippleGenerationInterval(100); // Default updateInterval
-      // ar.setRandomRippleTimeRange(100);		  // Default updateInterval
-      // // Random ripples are generated at RippleGenerationInterval (+/-) RippleTimeRange/2
-
-      // ar.createRandomRipple();
-      // ar.createWave();
-
-      // ar.setDampeningRatio(0.5); // Default 0.8
-
-      // ar.toggleRippleOnMove(); // Default True
 
       var cp = new ControlPanel();
       cp.addOptionControl("Node Style: ", {"list": ["base", "ascii", "water", "party"], "default": "ascii", "cb": (val) => {ar.setNodeStyle(val)}});
-      cp.addOptionControl("Math Mode: ", {"list": ["anair", "helias"], "default": "anair", "cb": (val) => {ar.setMathMode(val)}});
+      cp.addOptionControl("Math Mode: ", {"list": ["anair", "helias"], "default": defaultMathMode, "cb": (val) => {ar.setMathMode(val)}});
       cp.addSliderControl("Node Size: ", {"min": 5, "max": 20, "step": 0.1, "value": ar.getNodeSize(), "cb": (val) => {ar.setNodeSize(parseFloat(val));} });
       cp.addSliderControl("Frame Delay: ", {"min": 10, "max": 1000, "value": 100, "cb": (val) => {ar.setUpdateInterval(parseInt(val));} });
       cp.addNumberControl("Dampening: ", {"min": 0, "max": 1, "step": 0.01, "value": 0.8, "cb": (val) => {ar.setDampeningRatio(parseFloat(val));} });
-      cp.addSliderControl("Max Strength:", {"min": 0, "max": 400, "value": 100, "cb": (val) => { ar.setMaxRippleStrength(parseInt(val)); }});
+      cp.addSliderControl("Max Strength:", {"min": 0, "max": 400, "value": defaultMaxRippleStrength, "cb": (val) => { ar.setMaxRippleStrength(parseInt(val)); }});
 
-      cp.addBoolControl("Random Ripples: ", {"default": false, "cb": (val) => { ar.toggleRandomRipples(); }});
+      cp.addBoolControl("Random Ripples: ", {"default": isTouchDevice, "cb": (val) => { ar.toggleRandomRipples(); }});
       cp.addControlSection("Random Ripple Controls", {id: "randomRippleControls"});
       cp.addSliderControl("Ripple Delay:", {"min": 10, "max": 1000, "step": 10, "value": 100, "cb": (val) => { ar.setRandomRippleGenerationInterval(parseInt(val)); }}, "randomRippleControls");
       cp.addSliderControl("Delay Variance:", {"min": 10, "max": 1000, "value": 100, "cb": (val) => { ar.setRandomRippleTimeRange(val); }}, "randomRippleControls");
 
-      let isMoveEventPossible = !window.mobileAndTabletcheck(); // touchmove doesn't work as mousemove so can't use that
-      if (isMoveEventPossible)
-	  cp.addBoolControl("Ripple on Move:", {"default": isMoveEventPossible, "disabled": !isMoveEventPossible, "cb": (val) => { ar.toggleRippleOnMove(); }});
+      if (!isTouchDevice) // touchmove doesn't work as well as mousemove so can't use that
+	  cp.addBoolControl("Ripple on Move:", {"default": true, "disabled": false, "cb": (val) => { ar.toggleRippleOnMove(); }});
 
       cp.addButtonControl("Create Ripple!", {"cb": () => ar.createRandomRipple()});
       cp.addButtonControl("Create Wave!", {"cb": () => ar.createWave()});
