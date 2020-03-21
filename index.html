@@ -50,6 +50,7 @@
 
     <script src="ascii-ripple.js"></script>
     <script src="control-panel.js"></script>
+    <script src="mobile-check.js"></script>
     <script>
       var ar = new AsciiRipple("ripple-container");
       ar.setNodeStyle("ascii");
@@ -85,9 +86,15 @@
       cp.addSliderControl("Ripple Delay:", {"min": 10, "max": 1000, "step": 10, "value": 100, "cb": (val) => { ar.setRandomRippleGenerationInterval(parseInt(val)); }}, "randomRippleControls");
       cp.addSliderControl("Delay Variance:", {"min": 10, "max": 1000, "value": 100, "cb": (val) => { ar.setRandomRippleTimeRange(val); }}, "randomRippleControls");
 
-      cp.addBoolControl("Ripple on Move:", {"default": true, "cb": (val) => { ar.toggleRippleOnMove(); }});
+      let isMoveEventPossible = !window.mobileAndTabletcheck(); // touchmove doesn't work as mousemove so can't use that
+      if (isMoveEventPossible)
+	  cp.addBoolControl("Ripple on Move:", {"default": isMoveEventPossible, "disabled": !isMoveEventPossible, "cb": (val) => { ar.toggleRippleOnMove(); }});
+
+      cp.addButtonControl("Create Ripple!", {"cb": () => ar.createRandomRipple()});
+      cp.addButtonControl("Create Wave!", {"cb": () => ar.createWave()});
 
       cp.show();
+
     </script>
 
   </body>

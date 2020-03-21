@@ -88,11 +88,23 @@ class ControlPanel {
 	controlValue.type = "checkbox";
 	if (options.hasOwnProperty("default"))
 	    controlValue.checked = options["default"];
+	if (options.hasOwnProperty("disabled"))
+	    controlValue.disabled = options["disabled"];
 	if (options.hasOwnProperty("cb"))
 	    controlValue.onchange = (event) => options["cb"](event.target.checked);
 
 	this.addElementToController(controlLabel, sectionName);
 	this.addElementToController(controlValue, sectionName);
+    }
+    addButtonControl(name, options, sectionName="root") {
+	let controlButton = document.createElement("button");
+	controlButton.className = "control-button";
+	controlButton.type = "button";
+	controlButton.innerText = name;
+	if (options.hasOwnProperty("cb"))
+	    controlButton.onclick = () => options["cb"]();
+
+	this.addElementToController(controlButton, sectionName);
     }
     addControlSection(name, options, sectionName="root") {
 	let sectionContainer = document.createElement("div");
@@ -119,12 +131,14 @@ class ControlPanel {
 		controllerContainer.style.opacity = 0;
 		sectionTitleArrow.style.transform = "rotate(45deg)";
 		sectionTitleArrow.style.marginTop = "4px";
+		sectionTitle.style.marginBottom = "0px";
 	    }
 	    else {
 		controllerContainer.style.maxHeight = controllerContainer.actualHeight + "px";
 		controllerContainer.style.opacity = 1;
 		sectionTitleArrow.style.transform = "rotate(-135deg)";
 		sectionTitleArrow.style.marginTop = "7px";
+		sectionTitle.style.marginBottom = "10px";
 	    }
 	    controllerContainer.visible = !controllerContainer.visible;
 	};

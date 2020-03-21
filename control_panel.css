@@ -1,11 +1,13 @@
 .controller-container {
     position: absolute;
     width: 200px;
-    right: 20px;
+    right: 15px;
     top: 10vh;
 
     border-radius: 5px;
     background: rgba(100, 0, 0, 0.9);
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 12px;
     color: white;
 }
 .section-container {
@@ -14,12 +16,17 @@
     border-radius: 5px;
     padding: 5px;
 }
+.section-controller-container > *:last-child {
+    margin-bottom: 10px;
+}
 .section-title {
+    font-family: 'Roboto Mono', monospace;
     display: block;
     width: 100%;
     text-align: center;
     margin-bottom: 10px;
     cursor: pointer;
+    transition: margin-bottom 0.5s;
 }
 .section-title-arrow {
     /* content: 'ff'; */
@@ -36,14 +43,19 @@
 }
 .section-controller-container {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 55% 45%;
     grid-row-gap: 5px;
     grid-column-gap: 5px;
-    transition: max-height 0.5s, opacity 0.5s;
+    transition: max-height 0.3s, opacity 0.5s;
 }
 .control-label {
     text-align: center;
 }
 .control-value {
-    max-width: 90px;
+    max-width: 85%;
+}
+.control-button {
+    grid-column: span 2;
+    width: 80%;
+    margin: 0 auto;
 }

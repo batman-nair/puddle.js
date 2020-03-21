@@ -353,6 +353,7 @@ class AsciiRipple {
 
 	this.parentNode.innerHTML = '';
 	this.parentNode.style.fontFamily = "Lucida Sans Typewriter, Lucida Typewriter, monospace";
+	this.parentNode.style.fontFamily = "Lucida Console, Monaco, monospace";
 	this.parentNode.style.fontSize = this.nodeSize+2 + "px";
 	this.parentNode.style.display = "grid";
 	this.parentNode.style.gridTemplateColumns = "repeat("+this.numCols+", "+this.nodeSize+"px)";
@@ -413,7 +414,7 @@ class AsciiRipple {
 	}, timeout);
     }
     createWave() {
-	for (let yy = 0; yy < this.numCols; ++yy) {
+	for (let yy = 0; yy < this.numRows; ++yy) {
 	    this.data.getNode(0, yy).startRipple(400);
 	}
     }
