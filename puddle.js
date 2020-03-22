@@ -294,8 +294,8 @@ class PuddleData {
 }
 
 class Puddle {
-    constructor(elementID, updateInterval=100) {
-	this.parentNode = document.getElementById(elementID);
+    constructor(queryElement, updateInterval=100) {
+	this.parentNode = document.querySelector(queryElement);
 	this.data = new PuddleData(this.numRows, this.numCols);
 	this.areRandomRipplesGenerated = false;
 	this.updateInterval = updateInterval;
@@ -307,7 +307,6 @@ class Puddle {
 	this.nodeSize = 14;
 	this.mathMode = "anair";
 	this.updateLoop = undefined;
-	this.setupDefaultOptions();
     }
     setNodeStyle(nodeStyle) {
 	if (nodeStyle === "water")
@@ -349,6 +348,7 @@ class Puddle {
     }
     setupGrid() {
 	clearInterval(this.updateLoop);
+	this.setupDefaultOptions();
 	this.data.refresh(this.numRows, this.numCols);
 
 	this.parentNode.innerHTML = '';
@@ -429,7 +429,7 @@ class Puddle {
 
 /*
 All options
-puddle = new Puddle(<id-of-container>);
+puddle = new Puddle(<query-element>);
 
 puddle.setNodeStyle(nodeStyle);  // nodeStyle one of ["water", "party", "ascii", "base"]  // Default "ascii"
 puddle.setMathMode(mathMode);  // mathMode one of ["anair", "helias"]   // Default "anair"
