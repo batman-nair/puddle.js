@@ -72,6 +72,7 @@ class NodeBase {
 	}
     }
     updateNodeHelias() {
+	// Helias math mode taken from https://web.archive.org/web/20160418004149/http://freespace.virgin.net/hugo.elias/graphics/x_water.htm
 	let nodeUp = this.data.getNode(this.xx, this.yy - 1);
 	let nodeUpForce = nodeUp? nodeUp.currentForce : 0;
 	let nodeDown = this.data.getNode(this.xx, this.yy + 1);
@@ -198,7 +199,7 @@ class AsciiNode extends NodeBase {
 	    this.drawNode = this.drawNodeAnair;
     }
     getNodeElement() {
-	this.element = document.createElement("p");
+	this.element = document.createElement("span");
 	this.element.style.display = "block";
 	this.element.style.width = "100%";
 	this.element.style.height = "100%";

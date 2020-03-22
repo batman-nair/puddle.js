@@ -4,15 +4,34 @@
     <link href="https://fonts.googleapis.com/css?family=Fira+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="control-panel.css">
     <style>
+      body {
+	  background: #f0f0f0;
+      }
       #puddle-container {
-	  position: relative;
-	  top: 45vh;
-	  transform: translateY(-50%);
 	  width: 90vw;
-	  height: 80vh;
+	  height: 75vh;
 	  margin: 0 auto;
+	  color: #010c13;
+      }
+      .page-title {
+	  text-align: center;
+	  margin-top: 35px;
+	  margin-bottom: 20px;
+	  font-family: "Fira Mono", monospace;
+	  font-size: 1.8em;
+	  color: #101d28;
+      }
+      .page-subtitle {
+	  margin: 0;
+	  margin-bottom: 1.5em;
+	  text-align: center;
+	  font-family: "Fira Mono", monospace;
+	  font-size: 1.1em;
+	  color: #27384f;
       }
     </style>
+    <h3 class="page-title"> Puddle.js </h3>
+    <p class="page-subtitle"> Interactive fluid ripple simuluation library </p>
     <div id="puddle-container">
     </div>
 
