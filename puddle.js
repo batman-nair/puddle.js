@@ -431,7 +431,7 @@ class Puddle {
 All options
 puddle = new Puddle(<query-element>);
 
-puddle.setNodeStyle(nodeStyle);  // nodeStyle one of ["water", "party", "ascii", "base"]  // Default "ascii"
+puddle.setNodeStyle(nodeStyle);  // nodeStyle one of ["water", "party", "ascii", "base"]  // Default "base"
 puddle.setMathMode(mathMode);  // mathMode one of ["anair", "helias"]   // Default "anair"
 puddle.setNodeSize(nodeSize);  // Default 3% of min(height, width)
 puddle.setUpdateInterval(updateInterval);  // Default 100
