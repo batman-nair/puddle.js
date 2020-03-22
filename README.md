@@ -1,14 +1,14 @@
 # Puddle.js
 
 An ASCII/Node based fluid simulation library built with vanilla JS and CSS Grids.
-Visit the site to play around and test! [Puddle.js](https://batman-nair.github.io/puddle.js/)
+Visit the [site](https://batman-nair.github.io/puddle.js/)to play around and test!
 
 ## Screencaps
 
-Different Node styles!
+### Different Node styles!
 ![Move Ripples](screencaps/move_big.gif)
 
-Random Ripples mode!
+### Random Ripples mode!
 ![Random Ripples](screencaps/ripple_big.gif)
 
 
