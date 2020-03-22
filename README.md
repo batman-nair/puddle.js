@@ -46,6 +46,9 @@ puddle.toggleRippleOnMove(); // Default True
 
 ```
 
+I built my [personal site](https://batman-nair.github.io/) using this as an example for usage.
+
+
 ## Internal workings
 
 The different node styles are different classes NodeBase, AsciiNode, WaterNode, PartyNode.
