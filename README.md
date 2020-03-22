@@ -1,7 +1,8 @@
 # Puddle.js
 
 An ASCII/Node based fluid simulation library built with vanilla JS and CSS Grids.
-Visit the [site](https://batman-nair.github.io/puddle.js/)to play around and test!
+
+Visit the [site](https://batman-nair.github.io/puddle.js/) to play around and test!
 
 ## Screencaps
 
@@ -51,7 +52,7 @@ The different node styles are different classes NodeBase, AsciiNode, WaterNode, 
 
 There are 2 different math modes - how forces are updated every frame.
 
- 1. Anair - The initial mode developed. Every node has X and Y forces. The whole force is is transfered to the nodes in the direction of the force.
+ 1. Anair - The initial mode developed. Every node has X and Y forces. The whole force is is transfered to the nodes in the direction of the force in each frame.
  2. Helias - This was taken from [here](https://web.archive.org/web/20160418004149/http://freespace.virgin.net/hugo.elias/graphics/x_water.htm). The force updates in this mode are more based on actual wave motion.
 
 Every node to be updated is added to an updateQueue. When a click is registered, all the surrounding nodes are added to the updateQueue. In the update loop, the next force value for the node is calculated based on existing forces in the surrounding nodes. Once update is done, the node is added to a drawQueue.
@@ -59,3 +60,7 @@ Every node to be updated is added to an updateQueue. When a click is registered,
 At every frame, there is an update section where net forces for nodes in the updateQueue are calculated. After that, in the draw section, the current force is updated and the node is drawn.
 
 When a node is updated, it adds other nodes which will be affected by its force to the next updateQueue. This way only the affected nodes needs to be updated instead of updating te whole frame in every loop.
+
+## Contributing
+
+Feel free to add your own node style or whatever! Send in a PR and we'll discuss! :)
