@@ -2,7 +2,7 @@
 
 An ASCII/Node based fluid simulation library built with vanilla JS and CSS Grids.
 
-Visit the [site](https://batman-nair.github.io/puddle.js/) to play around and test!
+[Try it out and play around!](https://batman-nair.github.io/puddle.js/)
 
 ## Screencaps
 
